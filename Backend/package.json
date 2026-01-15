@@ -1,0 +1,29 @@
+{
+  "name": "real_estate_booking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManojK1405/Real_Estate_Booking.git"
+  },
+  "keywords": [],
+  "author": "Manoj Kalasgonda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ManojK1405/Real_Estate_Booking/issues"
+  },
+  "homepage": "https://github.com/ManojK1405/Real_Estate_Booking#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.3",
+    "validator": "^13.15.26"
+  }
+}
