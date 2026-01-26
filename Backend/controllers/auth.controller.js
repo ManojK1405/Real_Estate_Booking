@@ -156,3 +156,15 @@ export const google = async (req, res, next) => {
     next(error); // THIS was causing your 500
   }
 };
+
+/* ================= SIGNOUT ================= */
+export const signout = async (req, res, next) => {
+  try {
+    res.clearCookie("clientToken");
+    res.status(200).json({ message: "Signout successful" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+

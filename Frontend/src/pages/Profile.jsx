@@ -1,9 +1,305 @@
-import React from 'react'
+// import React, { useEffect } from 'react';
+// import { useSelector } from 'react-redux';
+// import { useState } from 'react';
+// import { useRef } from 'react';
+
+
+
+// const Profile = () => {
+
+//   const fileRef = React.useRef(null);
+
+//   const {currentUser} = useSelector((state) => state.user);
+//   const [file,setFile] = useState(undefined);
+
+//   console.log(file);
+
+//   useEffect(()=>{
+//     if(file){
+//       handleFileUpload(file);
+//     }
+//   },[file])
+
+//   const handleFileUpload = async(file)=>{
+//     const data = new FormData();
+//     data.append('file',file);
+
+//   }
+
+
+//   return (
+//     <div className="max-w-lg mx-auto p-4">
+//       {/* Title */}
+//       <h1 className="text-3xl font-bold text-center text-slate-700 mb-8">
+//         Profile
+//       </h1>
+
+//       {/* Avatar */}
+//       <input type='file' hidden accept='image/*' ref={fileRef} onChange={(e)=>setFile(e.target.files[0])} />
+//       <div className="flex justify-center mb-6">
+//         <img
+//           src={currentUser.avatar}
+//           alt="profile"
+//           className="h-24 w-24 rounded-full object-cover"
+//           onClick={()=>fileRef.current.click()}
+//         />
+//       </div>
+
+//       {/* Form */}
+//       <form className="space-y-4">
+//         <input
+//           type="text"
+//           placeholder='Username'
+//           className="w-full p-3 rounded-lg border bg-slate-100 focus:outline-none"
+//           defaultValue={currentUser.username}
+//         />
+
+//         <input
+//           type="email"
+//           placeholder="Email"
+//           defaultValue={currentUser.email}
+//           className="w-full p-3 rounded-lg border bg-slate-100 focus:outline-none"
+//         />
+
+//         <input
+//           type="Password"
+//           placeholder="Password"
+//           className="w-full p-3 rounded-lg border bg-slate-100 focus:outline-none"
+//         />
+
+//         {/* Update button */}
+//         <button
+//           type="button"
+//           className="w-full bg-slate-700 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90"
+//         >
+//           Update
+//         </button>
+
+//         {/* Create Listing */}
+//         <button
+//           type="button"
+//           className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90"
+//         >
+//           Create Listing
+//         </button>
+//       </form>
+
+//       {/* Bottom actions */}
+//       <div className="flex justify-between mt-6 text-sm">
+//         <span className="text-red-600 cursor-pointer">
+//           Delete Account
+//         </span>
+//         <span className="text-red-600 cursor-pointer">
+//           Sign out
+//         </span>
+//       </div>
+
+//       <p className="text-green-600 text-center mt-6 cursor-pointer">
+//         Show Listings
+//       </p>
+//     </div>
+//   );
+// };
+
+// export default Profile;
+
+
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+  signOut,
+} from '../redux/userSlice.js';
 
 const Profile = () => {
-  return (
-    <div>Profile</div>
-  )
-}
+  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-export default Profile
+  const fileRef = useRef(null);
+
+  const [file, setFile] = useState(null);
+  const [formData, setFormData] = useState({
+    username: currentUser.username,
+    email: currentUser.email,
+    avatar: currentUser.avatar,
+    password: '',
+  });
+
+  // Upload image when file changes
+  useEffect(() => {
+    if (file) uploadImage(file);
+  }, [file]);
+
+  // ✅ Cloudinary upload (FIXED)
+  const uploadImage = async (file) => {
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', 'InfinityVillas'); // MUST be unsigned
+
+    try {
+      const res = await fetch(
+        'https://api.cloudinary.com/v1_1/dy0drp7ka/image/upload',
+        {
+          method: 'POST',
+          body: data,
+        }
+      );
+
+      const imgData = await res.json();
+
+      if (!res.ok) {
+        console.error('Cloudinary error:', imgData);
+        alert(imgData.error?.message || 'Image upload failed');
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        avatar: imgData.secure_url,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Update profile
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    dispatch(updateUserStart());
+
+    try {
+      const res = await fetch(`http://localhost:4000/api/users/update/${currentUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      dispatch(updateUserSuccess(data));
+      alert('Profile updated successfully');
+    } catch (err) {
+      dispatch(updateUserFailure(err.message));
+    }
+  };
+
+  // Logout
+  const handleLogout = async () => {
+    await fetch('/api/auth/signout');
+    dispatch(signOut());
+    navigate('/sign-in');
+  };
+
+  //Delete Account
+  const handleDeleteAccount = async () =>{
+      await fetch(`/api/users/delete/${currentUser._id}`,{
+        method:'DELETE',    });
+      dispatch(signOut());
+      navigate('/sign-in');
+  }
+
+  return (
+    <div className="max-w-lg mx-auto p-4">
+      <h1 className="text-3xl font-bold text-center text-slate-700 mb-8">
+        Profile
+      </h1>
+
+      {/* Avatar */}
+      <input
+        type="file"
+        hidden
+        accept="image/*"
+        ref={fileRef}
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+
+      <div className="flex justify-center mb-6">
+        <img
+          src={formData.avatar}
+          alt="profile"
+          className="h-24 w-24 rounded-full object-cover cursor-pointer"
+          onClick={() => fileRef.current.click()}
+        />
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          className="w-full p-3 rounded-lg border bg-slate-100 focus:outline-none"
+          placeholder="Username"
+        />
+
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full p-3 rounded-lg border bg-slate-100 focus:outline-none"
+          placeholder="Email"
+        />
+
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          className="w-full p-3 rounded-lg border bg-slate-100 focus:outline-none"
+          placeholder="Password"
+        />
+
+        <button
+          disabled={loading}
+          className="w-full bg-slate-700 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90"
+        >
+          {loading ? 'Updating...' : 'Update'}
+        </button>
+
+        <button
+          type="button"
+          className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90"
+        >
+          Create Listing
+        </button>
+      </form>
+
+      {/* Bottom actions */}
+      <div className="flex justify-between mt-6 text-sm">
+        <span className="text-red-600 cursor-pointer" onClick={handleDeleteAccount}>
+          Delete Account
+        </span>
+        <span
+          onClick={handleLogout}
+          className="text-red-600 cursor-pointer"
+        >
+          Sign out
+        </span>
+      </div>
+
+      {error && (
+        <p className="text-red-600 text-center mt-4">{error}</p>
+      )}
+
+      <p className="text-green-600 text-center mt-6 cursor-pointer">
+        Show Listings
+      </p>
+    </div>
+  );
+};
+
+export default Profile;
