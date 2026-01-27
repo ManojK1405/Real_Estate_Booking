@@ -40,22 +40,22 @@ export const createUser = async (req, res, next) => {
 
 /**
  * UPDATE USER
- * PUT /api/user/update/:id
+ * POST /api/user/update/:id
  */
 export const updateUser = async (req, res, next) => {
-  // user can update only their own account
-  if (req.user.id !== req.params.id) {
-    return next(errorHandler(401, 'You can update only your account'));
-  }
-
   try {
+    if (!req.user || req.user.userId !== req.params.id) {
+      return res.status(401).json({
+        message: 'You can update only your account',
+      });
+    }
+
     const updateData = {
       username: req.body.username,
       email: req.body.email,
-      avatar: req.body.avatar, // Cloudinary URL
+      avatar: req.body.avatar,
     };
 
-    // hash password only if provided
     if (req.body.password) {
       updateData.password = bcrypt.hashSync(req.body.password, 10);
     }
@@ -66,6 +66,10 @@ export const updateUser = async (req, res, next) => {
       { new: true }
     );
 
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     const { password, ...rest } = updatedUser._doc;
     res.status(200).json(rest);
   } catch (error) {
@@ -73,19 +77,39 @@ export const updateUser = async (req, res, next) => {
   }
 };
 
+
 /**
  * DELETE USER
  * DELETE /api/user/delete/:id
  */
 export const deleteUser = async (req, res, next) => {
-  if (req.user.id !== req.params.id) {
-    return next(errorHandler(401, 'You can delete only your account'));
-  }
-
   try {
+    // allow only owner
+    if (!req.user || req.user.userId !== req.params.id) {
+      return res.status(401).json({
+        message: 'You can delete only your account',
+      });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     await User.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'User deleted successfully' });
+
+    // 🔥 clear JWT after deletion
+    res
+      .clearCookie('clientToken', {
+        httpOnly: true,
+        sameSite: 'lax',
+      })
+      .status(200)
+      .json({ message: 'Account deleted successfully' });
+
   } catch (error) {
     next(error);
   }
 };
+
+ 

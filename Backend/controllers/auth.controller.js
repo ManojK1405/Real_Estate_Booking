@@ -78,6 +78,7 @@ export const signin = async (req, res, next) => {
       .cookie("clientToken", token, {
         httpOnly: true,
         sameSite: "lax",
+        secure:false,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
@@ -153,7 +154,7 @@ export const google = async (req, res, next) => {
         user: userData,
       });
   } catch (error) {
-    next(error); // THIS was causing your 500
+    next(error); 
   }
 };
 
@@ -166,5 +167,3 @@ export const signout = async (req, res, next) => {
     next(error);
   }
 };
-
-

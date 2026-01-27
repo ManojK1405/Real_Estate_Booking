@@ -3,8 +3,11 @@ import {config} from "dotenv";
 import cors from "cors";
 import dbConnect from "./dbConnection/dbConnect.js";
 import authRouter from "./routes/auth.route.js";
+import listingRouter from "./routes/listing.route.js";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+
+
 
 
 const app = express();
@@ -25,6 +28,7 @@ import userRouter from "./routes/user.routes.js";
 // Routes
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/listing",listingRouter);
 
 
 app.use((err, req, res, next) => {

@@ -1,26 +1,16 @@
 import jwt from 'jsonwebtoken';
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.access_token;
-
+  const token = req.cookies.clientToken;
   if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: 'Unauthorized: No token',
-    });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({
-        success: false,
-        message: 'Forbidden: Invalid token',
-      });
+      return res.status(403).json({ message: 'Forbidden' });
     }
-
-    // 🔥 THIS IS THE KEY LINE
-    req.user = decoded;
+    req.user = user;
     next();
   });
 };
