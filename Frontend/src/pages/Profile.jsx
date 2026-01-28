@@ -180,7 +180,8 @@ const Profile = () => {
 
         <button
           type="button"
-          className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90"
+          className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90" 
+          onClick={() => navigate('/create-listing')}
         >
           Create Listing
         </button>
