@@ -80,7 +80,7 @@ export const getUserListings = async (req, res, next) => {
     if (req.user.userId !== req.params.id) {
       return res.status(401).json({
         message: 'You can view only your own listings',
-      });
+      }); 
     }
 
     const listings = await Listing.find({

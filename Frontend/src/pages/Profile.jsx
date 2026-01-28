@@ -23,6 +23,9 @@ const Profile = () => {
     avatar: currentUser.avatar,
     password: '',
   });
+  const [listings, setListings] = useState([]);
+  const [listingsFetched, setListingsFetched] = useState(false);
+
 
   // Upload image when file changes
   useEffect(() => {
@@ -60,6 +63,25 @@ const Profile = () => {
     }
   };
 
+  const handleShowListings = async () => {
+    try {
+      setListingsFetched(true);
+
+      const res = await fetch(
+        `http://localhost:4000/api/listing/listings/${currentUser._id}`,
+        { credentials: 'include' }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      setListings(data);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+
   // Input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -92,7 +114,7 @@ const Profile = () => {
 
   // ✅ LOGOUT (FIXED)
   const handleLogout = async () => {
-    await fetch('/api/auth/signout', {
+    await fetch('http://localhost:4000/api/auth/signout', {
       method: 'POST',          // 🔥 REQUIRED
       credentials: 'include',  // 🔥 REQUIRED
     });
@@ -207,9 +229,31 @@ const Profile = () => {
         <p className="text-red-600 text-center mt-4">{error}</p>
       )}
 
-      <p className="text-green-600 text-center mt-6 cursor-pointer">
+      <p className="text-green-600 text-center mt-6 cursor-pointer" onClick={handleShowListings}>
         Show Listings
       </p>
+      {listingsFetched && listings.length === 0 && (
+  <p className="text-center text-gray-500 mt-4">
+    No listings present
+  </p>
+)}
+
+  {listings.map((listing) => (
+    <div
+      key={listing._id}
+      onClick={() => navigate(`/listing/${listing._id}`)}
+      className="border rounded-lg p-3 mt-4 cursor-pointer hover:bg-slate-50"
+    >
+      <img
+        src={listing.imageUrls[0]}
+        alt="listing"
+        className="h-32 w-full object-cover rounded-lg"
+      />
+      <p className="font-semibold mt-2">{listing.name}</p>
+      <p className="text-sm text-gray-600">{listing.address}</p>
+    </div>
+  ))}
+
     </div>
   );
 };
