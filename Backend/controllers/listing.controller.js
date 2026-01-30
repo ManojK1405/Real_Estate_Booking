@@ -1,5 +1,6 @@
 import express from 'express';
 import Listing from '../models/listing.model.js';
+import User from '../models/user.model.js';
 
 /* ================= CREATE LISTING ================= */
 /* POST /api/listings/create */
@@ -121,7 +122,7 @@ export const deleteListing = async (req, res, next) => {
 };
 
 /* ================= UPDATE LISTING ================= */
-/* PUT /api/listings/update/:id */
+/* POST /api/listings/update/:id */
 export const updateListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id);
@@ -150,4 +151,41 @@ export const updateListing = async (req, res, next) => {
   }
 };
 
+/* ================= GET LISTING ================= */
+/* GET /api/listing/get/:id */
+export const getListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) {
+      res.status(404).json({
+        message: 'Listing not found',
+      });
+      return;
+    }
+
+    res.status(200).json(listing);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* Get Contact Details of the property owner*/
+export const getContactDetails = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) {
+      return res.status(404).json({ message: 'Listing not found' });
+    }
+
+    const owner = await User.findById(listing.userRef).select(
+      'username email'
+    );
+
+    res.status(200).json(owner);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 

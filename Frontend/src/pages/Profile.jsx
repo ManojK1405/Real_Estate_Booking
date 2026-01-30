@@ -63,6 +63,7 @@ const Profile = () => {
     }
   };
 
+  //Show all the listing of a user 
   const handleShowListings = async () => {
     try {
       setListingsFetched(true);
@@ -81,7 +82,7 @@ const Profile = () => {
     }
   };
 
-
+  
   // Input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -112,6 +113,13 @@ const Profile = () => {
     }
   };
 
+  //To track if data is changed so as to enable update button
+  const isChanged =
+  formData.username !== currentUser.username ||
+  formData.email !== currentUser.email ||
+  formData.avatar !== currentUser.avatar ||
+  formData.password.trim() !== '';
+
   // ✅ LOGOUT (FIXED)
   const handleLogout = async () => {
     await fetch('http://localhost:4000/api/auth/signout', {
@@ -139,6 +147,42 @@ const Profile = () => {
     dispatch(deleteUserSuccess(data));
     navigate('/sign-in');
   };
+
+// ================= DELETE LISTING =================
+// Deletes a listing created by the logged-in user
+const handleDeleteListing = async (listingId) => {
+  // Confirm before deleting
+  const confirmDelete = window.confirm('Are you sure you want to delete this listing?');
+  if (!confirmDelete) return;
+
+  try {
+    // Call backend delete API
+    const res = await fetch(
+      `http://localhost:4000/api/listing/delete/${listingId}`,
+      {
+        method: 'DELETE',
+        credentials: 'include', // send auth cookie
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+
+    // Remove deleted listing from UI
+    setListings((prev) =>
+      prev.filter((listing) => listing._id !== listingId)
+    );
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+// ================= UPDATE LISTING =================
+// Navigates to update listing page
+const handleUpdateListing = (listingId) => {
+  navigate(`/update-listing/${listingId}`);
+};
+
 
   return (
     <div className="max-w-lg mx-auto p-4">
@@ -194,11 +238,16 @@ const Profile = () => {
         />
 
         <button
-          disabled={loading}
-          className="w-full bg-slate-700 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90"
+          disabled={loading || !isChanged}
+          className={`w-full p-3 rounded-lg font-semibold uppercase 
+            ${loading || !isChanged
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-slate-700 text-white hover:opacity-90'
+            }`}
         >
           {loading ? 'Updating...' : 'Update'}
         </button>
+
 
         <button
           type="button"
@@ -233,26 +282,45 @@ const Profile = () => {
         Show Listings
       </p>
       {listingsFetched && listings.length === 0 && (
-  <p className="text-center text-gray-500 mt-4">
-    No listings present
-  </p>
-)}
+      <p className="text-center text-gray-500 mt-4">
+         No listings present
+      </p>
+    )}
 
   {listings.map((listing) => (
-    <div
-      key={listing._id}
+  <div
+    key={listing._id}
+    className="border rounded-lg p-3 mt-4 hover:bg-slate-50"
+  >
+
+    <img
+      src={listing.imageUrls[0]}
+      alt="listing"
+      className="h-32 w-full object-cover rounded-lg cursor-pointer"
       onClick={() => navigate(`/listing/${listing._id}`)}
-      className="border rounded-lg p-3 mt-4 cursor-pointer hover:bg-slate-50"
-    >
-      <img
-        src={listing.imageUrls[0]}
-        alt="listing"
-        className="h-32 w-full object-cover rounded-lg"
-      />
-      <p className="font-semibold mt-2">{listing.name}</p>
-      <p className="text-sm text-gray-600">{listing.address}</p>
+    />
+
+    <p className="font-semibold mt-2">{listing.name}</p>
+    <p className="text-sm text-gray-600">{listing.address}</p>
+
+    <div className="flex gap-3 mt-3">
+      <button
+        onClick={() => handleUpdateListing(listing._id)}
+        className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:opacity-90"
+      >
+        Update
+      </button>
+
+      <button
+        onClick={() => handleDeleteListing(listing._id)}
+        className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:opacity-90"
+      >
+        Delete
+      </button>
     </div>
-  ))}
+  </div>
+))}
+
 
     </div>
   );
