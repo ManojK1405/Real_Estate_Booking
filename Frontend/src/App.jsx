@@ -11,6 +11,7 @@ import CreateListing from './pages/CreateListing.jsx';
 import UpdateListing from './pages/UpdateListing.jsx';
 import Listing from './pages/Listing.jsx'
 import ContactDetails from './pages/ContactDetails.jsx';
+import Footer from './components/Footer.jsx'
 
 
 
@@ -31,6 +32,7 @@ function App() {
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
     </Routes>
+  <Footer />
   </BrowserRouter>
 }
 

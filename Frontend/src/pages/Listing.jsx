@@ -66,7 +66,7 @@ const Listing = () => {
 
         {/* ================= IMAGE SECTION ================= */}
         <div>
-          <div className="relative h-[420px] rounded-2xl overflow-hidden shadow-lg">
+          <div className="relative h-105 rounded-2xl overflow-hidden shadow-lg">
             <img
               src={listing.imageUrls[currentImage]}
               alt="listing"
