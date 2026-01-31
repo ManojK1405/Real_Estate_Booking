@@ -14,6 +14,8 @@ import ContactDetails from './pages/ContactDetails.jsx';
 import Footer from './components/Footer.jsx'
 import Search from './pages/Search.jsx';
 import FAQ from './pages/FAQ.jsx';
+import ContactSupport from './pages/ContactSupport.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
  
 function App() {
 
@@ -33,6 +35,8 @@ function App() {
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/faq" element={<FAQ />} />
+      <Route path='/contact' element={<ContactSupport />} />
+      <Route path='/privacy' element={<PrivacyPolicy />} />
     </Routes>
   <Footer />
   </BrowserRouter>
