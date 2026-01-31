@@ -13,6 +13,7 @@ import Listing from './pages/Listing.jsx'
 import ContactDetails from './pages/ContactDetails.jsx';
 import Footer from './components/Footer.jsx'
 import Search from './pages/Search.jsx';
+import FAQ from './pages/FAQ.jsx';
  
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
       <Route path="/listing/:id" element={<Listing />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
+      <Route path="/faq" element={<FAQ />} />
     </Routes>
   <Footer />
   </BrowserRouter>
