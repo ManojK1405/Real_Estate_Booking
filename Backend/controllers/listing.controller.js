@@ -191,7 +191,7 @@ export const getContactDetails = async (req, res) => {
 };
 
 /* ================= GET LISTINGS ================= */
-/* GET /api/listings/get */
+/* GET /api/listings/get  FOR SEARCH PAGE*/ 
 
 export const getListings = async (req, res, next) => {
   try {
@@ -208,21 +208,18 @@ export const getListings = async (req, res, next) => {
       order = 'desc',
     } = req.query;
 
-    /* ================= BUILD QUERY ================= */
     const query = {
-      name: { $regex: searchTerm, $options: 'i' },
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { address: { $regex: searchTerm, $options: 'i' } },
+      ],
     };
 
-    // apply filters ONLY if explicitly true
     if (offer === 'true') query.offer = true;
     if (furnished === 'true') query.furnished = true;
     if (parking === 'true') query.parking = true;
+    if (type && type !== 'all') query.type = type;
 
-    if (type && type !== 'all') {
-      query.type = type; // rent | sell
-    }
-
-    /* ================= FETCH ================= */
     const listings = await Listing.find(query)
       .sort({ [sort]: order === 'asc' ? 1 : -1 })
       .limit(limit)
