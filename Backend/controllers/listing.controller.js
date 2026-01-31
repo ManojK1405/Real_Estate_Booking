@@ -1,6 +1,7 @@
 import express from 'express';
 import Listing from '../models/listing.model.js';
 import User from '../models/user.model.js';
+import e from 'express';
 
 /* ================= CREATE LISTING ================= */
 /* POST /api/listings/create */
@@ -189,3 +190,46 @@ export const getContactDetails = async (req, res) => {
   }
 };
 
+/* ================= GET LISTINGS ================= */
+/* GET /api/listings/get */
+
+export const getListings = async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const startIndex = parseInt(req.query.startIndex) || 0;
+
+    const {
+      searchTerm = '',
+      offer,
+      furnished,
+      parking,
+      type,
+      sort = 'createdAt',
+      order = 'desc',
+    } = req.query;
+
+    /* ================= BUILD QUERY ================= */
+    const query = {
+      name: { $regex: searchTerm, $options: 'i' },
+    };
+
+    // apply filters ONLY if explicitly true
+    if (offer === 'true') query.offer = true;
+    if (furnished === 'true') query.furnished = true;
+    if (parking === 'true') query.parking = true;
+
+    if (type && type !== 'all') {
+      query.type = type; // rent | sell
+    }
+
+    /* ================= FETCH ================= */
+    const listings = await Listing.find(query)
+      .sort({ [sort]: order === 'asc' ? 1 : -1 })
+      .limit(limit)
+      .skip(startIndex);
+
+    res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -12,9 +12,8 @@ import UpdateListing from './pages/UpdateListing.jsx';
 import Listing from './pages/Listing.jsx'
 import ContactDetails from './pages/ContactDetails.jsx';
 import Footer from './components/Footer.jsx'
-
-
-
+import Search from './pages/Search.jsx';
+ 
 function App() {
 
   return <BrowserRouter>
@@ -22,6 +21,7 @@ function App() {
     <Routes>
       <Route path='/' element={<Home />} />
       <Route path="/about" element={<About />} />
+      <Route path="/search" element={<Search />} />
       <Route element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-listing" element={<CreateListing />} />
