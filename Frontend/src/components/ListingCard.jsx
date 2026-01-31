@@ -8,9 +8,12 @@ const ListingCard = ({ listing }) => {
   return (
     <Link to={`/listing/${listing._id}`}>
       <div
-        className="bg-white rounded-3xl border shadow-sm
-        overflow-hidden hover:shadow-xl transition"
-      >
+  className="bg-white rounded-3xl border shadow-sm overflow-hidden
+  transform transition-all duration-300 ease-out
+  hover:-translate-y-2 hover:scale-[1.02]
+  hover:shadow-2xl"
+>
+
         {/* IMAGE */}
         <div className="relative">
           <img
