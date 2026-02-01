@@ -137,6 +137,9 @@ const Signin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   // Clear stale errors on mount
   useEffect(() => {
     dispatch(signInFailure(null));
@@ -158,7 +161,7 @@ const Signin = () => {
     try {
       dispatch(signInStart());
 
-      const res = await fetch("http://localhost:4000/api/auth/signin", {
+      const res = await fetch(`${API_BASE}/api/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

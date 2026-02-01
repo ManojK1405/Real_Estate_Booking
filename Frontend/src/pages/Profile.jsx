@@ -27,6 +27,9 @@ const Profile = () => {
   const [listings, setListings] = useState([]);
   const [listingsFetched, setListingsFetched] = useState(false);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   /* ================= AVATAR UPLOAD ================= */
   useEffect(() => {
     if (file) uploadImage(file);
@@ -84,7 +87,7 @@ const Profile = () => {
   const handleShowListings = async () => {
     setListingsFetched(true);
     const res = await fetch(
-      `http://localhost:4000/api/listing/listings/${currentUser._id}`,
+      `${API_BASE}/api/listing/listings/${currentUser._id}`,
       { credentials: 'include' }
     );
     setListings(await res.json());
@@ -92,7 +95,7 @@ const Profile = () => {
 
   const handleDeleteListing = async (id) => {
     if (!window.confirm('Delete this listing?')) return;
-    await fetch(`http://localhost:4000/api/listing/delete/${id}`, {
+    await fetch(`${API_BASE}/api/listing/delete/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -100,7 +103,7 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    await fetch('http://localhost:4000/api/auth/signout', {
+    await fetch(`${API_BASE}/api/auth/signout`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -110,7 +113,7 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     if (!window.confirm('This action cannot be undone. Continue?')) return;
-    await fetch(`/api/users/delete/${currentUser._id}`, {
+    await fetch(`${API_BASE}/api/users/delete/${currentUser._id}`, {
       method: 'DELETE',
       credentials: 'include',
     });

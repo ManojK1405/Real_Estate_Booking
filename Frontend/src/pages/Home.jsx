@@ -10,16 +10,19 @@ const Home = () => {
   const [rentListings, setRentListings] = useState([]);
   const [saleListings, setSaleListings] = useState([]);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   useEffect(() => {
     const fetchData = async () => {
       const offer = await fetch(
-        'http://localhost:4000/api/listing/get?offer=true&limit=4'
+        `${API_BASE}/api/listing/get?offer=true&limit=4`
       );
       const rent = await fetch(
-        'http://localhost:4000/api/listing/get?type=rent&limit=4'
+        `${API_BASE}/api/listing/get?type=rent&limit=4`
       );
       const sale = await fetch(
-        'http://localhost:4000/api/listing/get?type=sell&limit=4'
+        `${API_BASE}/api/listing/get?type=sell&limit=4`
       );
 
       setOfferListings(await offer.json());

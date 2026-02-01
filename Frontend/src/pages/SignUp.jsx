@@ -103,6 +103,9 @@ const SignUp = () => {
 
   const navigate = useNavigate();
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   // Clear error on mount (refresh-safe)
   useEffect(() => {
     setError(null);
@@ -125,7 +128,7 @@ const SignUp = () => {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/signup", {
+      const res = await fetch(`${API_BASE}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

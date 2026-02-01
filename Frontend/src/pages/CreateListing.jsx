@@ -211,6 +211,9 @@ const CreateListing = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -301,7 +304,7 @@ const CreateListing = () => {
 
     try {
       const res = await fetch(
-        'http://localhost:4000/api/listing/create',
+        `${API_BASE}/api/listing/create`,
         {
           method: 'POST',
           credentials: 'include',

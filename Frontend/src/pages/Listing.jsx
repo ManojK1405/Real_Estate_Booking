@@ -13,12 +13,15 @@ const Listing = () => {
   const [error, setError] = useState('');
   const [currentImage, setCurrentImage] = useState(0);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   /* ================= FETCH LISTING ================= */
   useEffect(() => {
     const fetchListing = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/listing/get/${id}`,
+          `${API_BASE}/api/listing/get/${id}`,
           { credentials: 'include' }
         );
         const data = await res.json();

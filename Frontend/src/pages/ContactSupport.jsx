@@ -10,6 +10,9 @@ const ContactSupport = () => {
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   const isFormValid =
     name.trim() && email.trim() && message.trim();
 
@@ -17,7 +20,7 @@ const ContactSupport = () => {
     if (!isFormValid) return;
 
     try {
-      await fetch('http://localhost:4000/api/message/messageApp', {
+      await fetch(`${API_BASE}/api/message/messageApp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, message })

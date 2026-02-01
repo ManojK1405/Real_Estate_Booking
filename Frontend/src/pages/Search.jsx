@@ -265,6 +265,9 @@ const Search = () => {
   const [showLoadMore, setShowLoadMore] = useState(false);
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   /* ================= SYNC URL → FILTER STATE ================= */
   useEffect(() => {
     setFilters({
@@ -286,7 +289,7 @@ const Search = () => {
       params.set('startIndex', startIndex);
 
       const res = await fetch(
-        `http://localhost:4000/api/listing/get?${params.toString()}`
+        `${API_BASE}/api/listing/get?${params.toString()}`
       );
       const data = await res.json();
 
