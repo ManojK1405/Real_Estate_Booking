@@ -66,12 +66,30 @@ const Footer = () => {
 
         {/* CONTACT */}
         <div>
-          <h3 className="text-gray-800 font-medium mb-3">
-            Get in Touch
-          </h3>
-          <p>📍 India</p>
-          <p>✉ support@infinityvillas.com</p>
-        </div>
+        <h3 className="text-gray-800 font-medium mb-3">
+          Get in Touch
+        </h3>
+
+        {/* 📍 Location → Google Maps */}
+      <a
+      href="https://www.google.com/maps/place/Pune,+Maharashtra,+India"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block hover:text-gray-900 transition cursor-pointer"
+        >
+          📍 Pune, India
+      </a>
+
+      <a
+      href="mailto:support@infinityvillas.com"
+      className="block hover:text-gray-900 transition cursor-pointer"
+      >
+       ✉ support@infinityvillas.com
+      </a>
+
+
+</div>
+
       </div>
 
       {/* BOTTOM */}

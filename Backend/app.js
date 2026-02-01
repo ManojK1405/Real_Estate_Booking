@@ -6,8 +6,8 @@ import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-
-
+import messageRouter from "./routes/message.route.js";
+import userRouter from "./routes/user.routes.js";
 
 
 const app = express();
@@ -23,12 +23,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 
-import userRouter from "./routes/user.routes.js";
 
 // Routes
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing",listingRouter);
+app.use("/api/message",messageRouter);
 
 
 app.use((err, req, res, next) => {

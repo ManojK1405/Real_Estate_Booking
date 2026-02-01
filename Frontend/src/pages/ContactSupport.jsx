@@ -1,7 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import InfoItem from '../components/InfoItem';
+import Input from '../components/Input';
+import Textarea from '../components/Textarea';
 
 const ContactSupport = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const isFormValid =
+    name.trim() && email.trim() && message.trim();
+
+  const handleSubmit = async () => {
+    if (!isFormValid) return;
+
+    try {
+      await fetch('http://localhost:4000/api/message/messageApp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      setName('');
+      setEmail('');
+      setMessage('');
+      setSuccess(true);
+
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen py-24 px-6">
       <motion.div
@@ -45,12 +77,10 @@ const ContactSupport = () => {
               Pune, Maharashtra, India
             </InfoItem>
 
-            <div className="pt-4">
-              <p className="text-sm text-gray-500">
-                Our support team is available Monday to Saturday,
-                9:00 AM – 6:00 PM IST.
-              </p>
-            </div>
+            <p className="text-sm text-gray-500 pt-4">
+              Our support team is available Monday to Saturday,
+              9:00 AM – 6:00 PM IST.
+            </p>
           </motion.div>
 
           {/* SUPPORT FORM */}
@@ -62,23 +92,70 @@ const ContactSupport = () => {
               Send Us a Message
             </h2>
 
-            <form className="space-y-6">
-              <Input label="Your Name" placeholder="Enter your full name" />
-              <Input label="Email Address" placeholder="you@example.com" />
-              <Textarea label="Message" placeholder="How can we help you?" />
+            {!success ? (
+              <form className="space-y-6">
+                <Input
+                  label="Your Name"
+                  placeholder="Enter your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
 
-              <button
-                type="button"
-                className="w-full bg-slate-800 text-white py-4 rounded-2xl
-                font-medium hover:opacity-90 transition"
+                <Input
+                  label="Email Address"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <Textarea
+                  label="Message"
+                  placeholder="How can we help you?"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+
+                <button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={handleSubmit}
+                  className="w-full bg-slate-800 text-white py-4 rounded-2xl
+                  font-medium hover:opacity-90 transition
+                  disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Submit Message
+                </button>
+              </form>
+            ) : (
+              <motion.div
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="flex flex-col items-center justify-center text-center py-14"
               >
-                Submit Message
-              </button>
-            </form>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 120 }}
+                  className="text-6xl mb-6"
+                >
+                  🎉
+                </motion.div>
+
+                <h3 className="text-2xl font-semibold text-slate-800 mb-2">
+                  Message Sent Successfully!
+                </h3>
+
+                <p className="text-gray-600 max-w-sm">
+                  Thanks for contacting Infinity Villas.
+                  Our team will get back to you shortly.
+                </p>
+              </motion.div>
+            )}
           </motion.div>
         </div>
 
-        {/* FOOTER NOTE */}
+        {/* FOOTER */}
         <div className="text-center mt-24 text-gray-500 text-sm">
           © {new Date().getFullYear()} ♾️ Infinity Villas · Designed with care for premium living
         </div>
@@ -86,45 +163,5 @@ const ContactSupport = () => {
     </div>
   );
 };
-
-/* ================= REUSABLE UI ================= */
-
-const InfoItem = ({ icon, title, children }) => (
-  <div className="flex items-start gap-4">
-    <span className="text-2xl">{icon}</span>
-    <div>
-      <p className="font-medium text-slate-700">{title}</p>
-      <p className="text-gray-600">{children}</p>
-    </div>
-  </div>
-);
-
-const Input = ({ label, placeholder }) => (
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-gray-600">
-      {label}
-    </label>
-    <input
-      type="text"
-      placeholder={placeholder}
-      className="w-full border rounded-xl px-4 py-3
-      focus:outline-none focus:ring-2 focus:ring-slate-400"
-    />
-  </div>
-);
-
-const Textarea = ({ label, placeholder }) => (
-  <div className="space-y-2">
-    <label className="text-sm font-medium text-gray-600">
-      {label}
-    </label>
-    <textarea
-      placeholder={placeholder}
-      rows={5}
-      className="w-full border rounded-xl px-4 py-3
-      resize-none focus:outline-none focus:ring-2 focus:ring-slate-400"
-    />
-  </div>
-);
 
 export default ContactSupport;
