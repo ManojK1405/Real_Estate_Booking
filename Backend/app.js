@@ -14,9 +14,13 @@ const app = express();
 config({path:"./config/.env"});
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://real-estate-booking-one.vercel.app"
+  ],
   credentials: true
 }));
+
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true })); 
