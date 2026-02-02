@@ -53,7 +53,8 @@ const Listing = () => {
   if (error) return <p className="text-center mt-20 text-red-500">{error}</p>;
 
   const price = listing.offer ? listing.discountPrice : listing.regularPrice;
-  const perDayPrice = Math.round(price / 30);
+  const perDayPrice = Math.round(price / 21);
+  const perWeekendPrice = Math.round(price / 12);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -147,7 +148,10 @@ const Listing = () => {
                   ₹ {price.toLocaleString()} / month
                 </p>
                 <p className="text-gray-500">
-                  ₹ {perDayPrice.toLocaleString()} / day for weekends
+                  ₹ {perWeekendPrice.toLocaleString()} / day for weekends
+                </p>
+                <p className="text-gray-500">
+                  ₹ {perDayPrice.toLocaleString()} / day for Weekdays
                 </p>
               </>
             )}
