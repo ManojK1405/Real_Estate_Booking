@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -12,43 +12,53 @@ const Home = () => {
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+  // 🔥 Cloudinary optimizer
+  const optimizeImage = (url, width = 1200) => {
+    if (!url?.includes('cloudinary')) return url;
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+  };
 
+  // 🚀 Parallel fetch
   useEffect(() => {
     const fetchData = async () => {
-      const offer = await fetch(
-        `${API_BASE}/api/listing/get?offer=true&limit=4`
-      );
-      const rent = await fetch(
-        `${API_BASE}/api/listing/get?type=rent&limit=4`
-      );
-      const sale = await fetch(
-        `${API_BASE}/api/listing/get?type=sell&limit=4`
-      );
+      try {
+        const [offerRes, rentRes, saleRes] = await Promise.all([
+          fetch(`${API_BASE}/api/listing/get?offer=true&limit=4`),
+          fetch(`${API_BASE}/api/listing/get?type=rent&limit=4`),
+          fetch(`${API_BASE}/api/listing/get?type=sell&limit=4`),
+        ]);
 
-      setOfferListings(await offer.json());
-      setRentListings(await rent.json());
-      setSaleListings(await sale.json());
+        setOfferListings(await offerRes.json());
+        setRentListings(await rentRes.json());
+        setSaleListings(await saleRes.json());
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     fetchData();
   }, []);
 
+  // 🎯 Optimized swiper data
+  const swiperListings = useMemo(
+    () =>
+      offerListings.slice(0, 2)
+        .concat(rentListings.slice(0, 2))
+        .concat(saleListings.slice(0, 2)),
+    [offerListings, rentListings, saleListings]
+  );
+
   return (
     <div className="bg-slate-50">
 
-
 {/* ================= HERO ================= */}
-<section className="relative bg-slate-50 overflow-hidden">
-  
-  {/* subtle background accent */}
+<section className="relative overflow-hidden">
   <div className="absolute inset-0 pointer-events-none">
     <div className="absolute -top-32 -right-32 h-[420px] w-[420px] rounded-full bg-slate-200/40 blur-3xl" />
     <div className="absolute top-40 -left-32 h-[360px] w-[360px] rounded-full bg-slate-300/30 blur-3xl" />
   </div>
 
   <div className="relative max-w-7xl mx-auto px-6 py-32 text-center">
-
-    {/* eyebrow */}
     <motion.p
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -58,12 +68,11 @@ const Home = () => {
       Premium Real Estate Platform
     </motion.p>
 
-    {/* headline */}
     <motion.h1
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7 }}
-      className="text-5xl sm:text-6xl font-bold text-slate-900 leading-tight"
+      className="text-5xl sm:text-6xl font-bold text-slate-900"
     >
       Discover Homes That
       <span className="block mt-2 text-slate-600">
@@ -71,150 +80,108 @@ const Home = () => {
       </span>
     </motion.h1>
 
-    {/* subtext */}
     <motion.p
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay: 0.15 }}
-      className="mt-8 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
+      className="mt-8 text-lg text-gray-600 max-w-2xl mx-auto"
     >
-      ♾️ Villas is a thoughtfully designed real estate experience —
-      blending clarity, aesthetics, and performance to help people
-      find places they truly belong.
+      ♾️ Villas blends clarity, aesthetics, and performance to help
+      people find places they truly belong.
     </motion.p>
 
-    {/* actions */}
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay: 0.3 }}
       className="mt-12 flex justify-center gap-5"
     >
-      <a
-        href="/search"
-        className="bg-slate-900 text-white px-10 py-4 rounded-2xl
-        font-medium shadow-lg hover:-translate-y-0.5
-        hover:shadow-xl transition"
-      >
+      <a href="/search" className="bg-slate-900 text-white px-10 py-4 rounded-2xl shadow-lg">
         Explore Listings
       </a>
-
-      <a
-        href="/about"
-        className="px-10 py-4 rounded-2xl border
-        font-medium text-slate-700 hover:bg-slate-100 transition"
-      >
+      <a href="/about" className="px-10 py-4 rounded-2xl border text-slate-700">
         Our Philosophy
       </a>
     </motion.div>
-
   </div>
 </section>
 
+{/* ================= SWIPER ================= */}
+<section className="w-full py-16 bg-white">
+  <Swiper
+    modules={[Autoplay]}
+    autoplay={{ delay: 3500, disableOnInteraction: false }}
+    loop
+    className="h-[420px]"
+  >
+    {swiperListings.map((listing) => (
+      <SwiperSlide key={listing._id}>
+        <div className="relative h-full w-full">
+          <img
+            src={optimizeImage(listing.imageUrls[0], 1400)}
+            alt={listing.name}
+            loading="eager"
+            fetchpriority="high"
+            className="h-full w-full object-cover"
+          />
 
-      {/* ================= FULL WIDTH SWIPER ================= */}
-      <section className="w-full py-16 bg-white">
-        <Swiper
-          modules={[Autoplay]}
-          autoplay={{ delay: 3500, disableOnInteraction: false }}
-          loop
-          className="h-[420px]"
-        >
-          {[...offerListings, ...rentListings, ...saleListings]
-            .slice(0, 6)
-            .map((listing) => (
-              <SwiperSlide key={listing._id}>
-                <div className="relative h-full w-full">
-                  <img
-                    src={listing.imageUrls[0]}
-                    alt={listing.name}
-                    className="h-full w-full object-cover"
-                  />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
 
-                  <div className="absolute inset-0 bg-gradient-to-t
-                    from-black/40 via-black/10 to-transparent" />
+          <div className="absolute bottom-8 left-8 text-white">
+            <h3 className="text-2xl font-semibold">{listing.name}</h3>
+            <p className="text-sm">📍 {listing.address}</p>
+          </div>
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</section>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute bottom-8 left-8 text-white"
-                  >
-                    <h3 className="text-2xl font-semibold">
-                      {listing.name}
-                    </h3>
-                    <p className="text-sm mt-1">
-                      📍 {listing.address}
-                    </p>
-                  </motion.div>
-                </div>
-              </SwiperSlide>
-            ))}
-        </Swiper>
-      </section>
+{/* ================= LISTINGS ================= */}
+<section className="max-w-7xl mx-auto px-6 py-24 space-y-24">
 
-      {/* ================= LISTING SECTIONS ================= */}
-      <section className="max-w-7xl mx-auto px-6 py-24 space-y-24">
+  {offerListings.length > 0 && (
+    <Section title="🔥 Recent Offers">
+      {offerListings.map((l) => (
+        <ListingCard key={l._id} listing={l} />
+      ))}
+    </Section>
+  )}
 
-        {/* OFFERS */}
-        {offerListings.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-semibold mb-6">
-              🔥 Recent Offers
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {offerListings.map((listing) => (
-                <ListingCard key={listing._id} listing={listing} />
-              ))}
-            </div>
-          </motion.div>
-        )}
+  {rentListings.length > 0 && (
+    <Section title="🏠 Places for Rent">
+      {rentListings.map((l) => (
+        <ListingCard key={l._id} listing={l} />
+      ))}
+    </Section>
+  )}
 
-        {/* RENT */}
-        {rentListings.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-semibold mb-6">
-              🏠 Places for Rent
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {rentListings.map((listing) => (
-                <ListingCard key={listing._id} listing={listing} />
-              ))}
-            </div>
-          </motion.div>
-        )}
+  {saleListings.length > 0 && (
+    <Section title="💰 Places for Sale">
+      {saleListings.map((l) => (
+        <ListingCard key={l._id} listing={l} />
+      ))}
+    </Section>
+  )}
 
-        {/* SALE */}
-        {saleListings.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-semibold mb-6">
-              💰 Places for Sale
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {saleListings.map((listing) => (
-                <ListingCard key={listing._id} listing={listing} />
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </section>
-    </div>
-  );
+</section>
+</div>
+);
 };
+
+// 🔹 Reusable section wrapper
+const Section = ({ title, children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6 }}
+  >
+    <h2 className="text-2xl font-semibold mb-6">{title}</h2>
+    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {children}
+    </div>
+  </motion.div>
+);
 
 export default Home;
