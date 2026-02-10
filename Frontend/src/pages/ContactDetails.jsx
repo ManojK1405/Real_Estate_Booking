@@ -118,6 +118,9 @@ const ContactDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   useEffect(() => {
     if (!listingId) {
       navigate('/');
@@ -127,7 +130,7 @@ const ContactDetails = () => {
     const fetchOwner = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/listing/contact/${listingId}`,
+          `${API_BASE}/api/listing/contact/${listingId}`,
           { credentials: 'include' }
         );
         const data = await res.json();

@@ -77,8 +77,8 @@ export const signin = async (req, res, next) => {
     res
       .cookie("clientToken", token, {
         httpOnly: true,
-        sameSite: "lax",
-        secure:false,
+        sameSite: "none",
+        secure:true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
@@ -111,7 +111,8 @@ export const google = async (req, res, next) => {
       return res
         .cookie("clientToken", token, {
           httpOnly: true,
-          sameSite: "lax",
+          sameSite: "none",
+          secure:true,
           maxAge: 7 * 24 * 60 * 60 * 1000,
         })
         .status(200)
@@ -145,7 +146,8 @@ export const google = async (req, res, next) => {
     res
       .cookie("clientToken", token, {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
+        secure:true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)

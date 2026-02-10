@@ -25,18 +25,18 @@ function App() {
       <Route path='/' element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/search" element={<Search />} />
-      <Route element={<PrivateRoute />}>
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/create-listing" element={<CreateListing />} />
-        <Route path="/update-listing/:id" element={<UpdateListing />} />
-        <Route path="/contact-details/:id" element={<ContactDetails />} />
-      </Route>
       <Route path="/listing/:id" element={<Listing />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path='/contact' element={<ContactSupport />} />
       <Route path='/privacy' element={<PrivacyPolicy />} />
+      <Route element={<PrivateRoute />}>
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/create-listing" element={<CreateListing />} />
+        <Route path="/update-listing/:id" element={<UpdateListing />} />
+        <Route path="/contact-details/:id" element={<ContactDetails />} />
+      </Route>
     </Routes>
   <Footer />
   </BrowserRouter>

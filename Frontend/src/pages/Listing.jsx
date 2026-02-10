@@ -13,12 +13,15 @@ const Listing = () => {
   const [error, setError] = useState('');
   const [currentImage, setCurrentImage] = useState(0);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   /* ================= FETCH LISTING ================= */
   useEffect(() => {
     const fetchListing = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/listing/get/${id}`,
+          `${API_BASE}/api/listing/get/${id}`,
           { credentials: 'include' }
         );
         const data = await res.json();
@@ -50,7 +53,8 @@ const Listing = () => {
   if (error) return <p className="text-center mt-20 text-red-500">{error}</p>;
 
   const price = listing.offer ? listing.discountPrice : listing.regularPrice;
-  const perDayPrice = Math.round(price / 30);
+  const perDayPrice = Math.round(price / 21);
+  const perWeekendPrice = Math.round(price / 12);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -144,7 +148,10 @@ const Listing = () => {
                   ₹ {price.toLocaleString()} / month
                 </p>
                 <p className="text-gray-500">
-                  ₹ {perDayPrice.toLocaleString()} / day for weekends
+                  ₹ {perWeekendPrice.toLocaleString()} / day for weekends
+                </p>
+                <p className="text-gray-500">
+                  ₹ {perDayPrice.toLocaleString()} / day for Weekdays
                 </p>
               </>
             )}

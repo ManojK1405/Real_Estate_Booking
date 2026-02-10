@@ -27,26 +27,30 @@ const Profile = () => {
   const [listings, setListings] = useState([]);
   const [listingsFetched, setListingsFetched] = useState(false);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
   /* ================= AVATAR UPLOAD ================= */
   useEffect(() => {
-    if (file) uploadImage(file);
+    if (!file) return;
+
+    const uploadImage = async () => {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', 'InfinityVillas');
+
+      const res = await fetch(
+        'https://api.cloudinary.com/v1_1/dy0drp7ka/image/upload',
+        { method: 'POST', body: data }
+      );
+      const imgData = await res.json();
+
+      if (res.ok) {
+        setFormData((prev) => ({ ...prev, avatar: imgData.secure_url }));
+      }
+    };
+
+    uploadImage();
   }, [file]);
-
-  const uploadImage = async (file) => {
-    const data = new FormData();
-    data.append('file', file);
-    data.append('upload_preset', 'InfinityVillas');
-
-    const res = await fetch(
-      'https://api.cloudinary.com/v1_1/dy0drp7ka/image/upload',
-      { method: 'POST', body: data }
-    );
-    const imgData = await res.json();
-
-    if (res.ok) {
-      setFormData((prev) => ({ ...prev, avatar: imgData.secure_url }));
-    }
-  };
 
   /* ================= FORM ================= */
   const handleChange = (e) =>
@@ -63,7 +67,7 @@ const Profile = () => {
     dispatch(updateUserStart());
 
     try {
-      const res = await fetch(`/api/users/update/${currentUser._id}`, {
+      const res = await fetch(`${API_BASE}/api/users/update/${currentUser._id}`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +88,7 @@ const Profile = () => {
   const handleShowListings = async () => {
     setListingsFetched(true);
     const res = await fetch(
-      `http://localhost:4000/api/listing/listings/${currentUser._id}`,
+      `${API_BASE}/api/listing/listings/${currentUser._id}`,
       { credentials: 'include' }
     );
     setListings(await res.json());
@@ -92,7 +96,7 @@ const Profile = () => {
 
   const handleDeleteListing = async (id) => {
     if (!window.confirm('Delete this listing?')) return;
-    await fetch(`http://localhost:4000/api/listing/delete/${id}`, {
+    await fetch(`${API_BASE}/api/listing/delete/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -100,7 +104,7 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    await fetch('http://localhost:4000/api/auth/signout', {
+    await fetch(`${API_BASE}/api/auth/signout`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -110,7 +114,7 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     if (!window.confirm('This action cannot be undone. Continue?')) return;
-    await fetch(`/api/users/delete/${currentUser._id}`, {
+    await fetch(`${API_BASE}/api/users/delete/${currentUser._id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -202,27 +206,30 @@ const Profile = () => {
           )}
         </div>
 
-        {/* ================= USER LISTINGS ================= */}
-        <div className="mt-24 text-center">
-          <button
-            onClick={handleShowListings}
-            className="text-slate-700 font-medium hover:underline"
-          >
-            View Your Listings
-          </button>
+        {/* ================= MODERN LISTINGS ================= */}
+        <div className="mt-28">
+          <div className="text-center">
+            <button
+              onClick={handleShowListings}
+              className="text-lg font-medium text-slate-800
+              hover:underline underline-offset-4"
+            >
+              View Your Listings
+            </button>
+          </div>
 
           <AnimatePresence>
             {listingsFetched && (
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 24 }}
+                exit={{ opacity: 0, y: 30 }}
                 transition={{ duration: 0.5 }}
-                className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"
+                className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-14"
               >
                 {listings.length === 0 && (
-                  <p className="col-span-full text-gray-500">
-                    No listings found.
+                  <p className="col-span-full text-center text-gray-500">
+                    You haven’t created any listings yet.
                   </p>
                 )}
 
@@ -231,41 +238,56 @@ const Profile = () => {
                     key={listing._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.08 }}
-                    whileHover={{ y: -6, scale: 1.02 }}
-                    className="bg-white border rounded-2xl shadow-sm overflow-hidden"
+                    transition={{ delay: index * 0.06 }}
+                    className="group relative bg-white rounded-3xl
+                    border shadow-sm hover:shadow-xl transition overflow-hidden"
                   >
-                    <img
-                      src={listing.imageUrls[0]}
-                      alt={listing.name}
+                    {/* IMAGE */}
+                    <div
                       onClick={() => navigate(`/listing/${listing._id}`)}
-                      className="h-40 w-full object-cover cursor-pointer"
-                    />
+                      className="relative h-48 overflow-hidden cursor-pointer"
+                    >
+                      <img
+                        src={listing.imageUrls[0]}
+                        alt={listing.name}
+                        className="h-full w-full object-cover
+                        group-hover:scale-105 transition duration-500"
+                      />
 
-                    <div className="p-4">
-                      <p className="font-semibold">{listing.name}</p>
-                      <p className="text-sm text-gray-500">
-                        {listing.address}
-                      </p>
-
-                      <div className="flex gap-3 mt-4">
+                      {/* ACTIONS */}
+                      <div className="absolute top-4 right-4 flex gap-2
+                      opacity-0 group-hover:opacity-100 transition">
                         <button
-                          onClick={() =>
-                            navigate(`/update-listing/${listing._id}`)
-                          }
-                          className="flex-1 py-2 bg-blue-600 text-white rounded-lg"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/update-listing/${listing._id}`);
+                          }}
+                          className="bg-white/90 backdrop-blur px-3 py-1.5
+                          rounded-full text-sm shadow hover:bg-white"
                         >
-                          Update
+                          ✏️ Edit
                         </button>
                         <button
-                          onClick={() =>
-                            handleDeleteListing(listing._id)
-                          }
-                          className="flex-1 py-2 bg-red-600 text-white rounded-lg"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteListing(listing._id);
+                          }}
+                          className="bg-red-500 text-white px-3 py-1.5
+                          rounded-full text-sm shadow hover:bg-red-600"
                         >
-                          Delete
+                          🗑 Delete
                         </button>
                       </div>
+                    </div>
+
+                    {/* CONTENT */}
+                    <div className="p-5">
+                      <h3 className="font-semibold text-slate-800 text-lg">
+                        {listing.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        📍 {listing.address}
+                      </p>
                     </div>
                   </motion.div>
                 ))}

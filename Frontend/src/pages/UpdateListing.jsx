@@ -296,12 +296,15 @@ const UpdateListing = () => {
 
   const [originalData, setOriginalData] = useState(null);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+
   /* ================= FETCH ================= */
   useEffect(() => {
     const fetchListing = async () => {
       try {
         const res = await fetch(
-          `http://localhost:4000/api/listing/get/${id}`,
+          `${API_BASE}/api/listing/get/${id}`,
           { credentials: 'include' }
         );
         const data = await res.json();
@@ -310,7 +313,7 @@ const UpdateListing = () => {
         setFormData(data);
         setPreviewImages(data.imageUrls);
         setOriginalData(data);
-      } catch {
+      } catch (err){
         navigate('/');
       }
     };
@@ -413,7 +416,7 @@ const UpdateListing = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/api/listing/update/${id}`,
+        `${API_BASE}/api/listing/update/${id}`,
         {
           method: 'POST',
           credentials: 'include',
