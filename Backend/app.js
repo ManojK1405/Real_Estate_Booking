@@ -14,10 +14,10 @@ const app = express();
 config({path:"./config/.env"});
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://real-estate-booking-one.vercel.app"
-  ],
+  origin: ["http://localhost:5173", "https://infinityvillas.vercel.app",""https://real-estate-booking-one.vercel.app""],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
