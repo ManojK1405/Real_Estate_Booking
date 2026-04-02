@@ -6,11 +6,6 @@ The platform focuses on clean UI, secure authentication, optimized media handlin
 
 ---
 
-## 🚀 Live Demo
-https://real-estate-booking-one.vercel.app/
-
----
-
 ## 🛠 Tech Stack
 
 ### Frontend
